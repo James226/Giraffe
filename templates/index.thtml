@@ -5,20 +5,19 @@
 </head>
 
 <body>
-	This is a 
+	This is a real 
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
-	{Test}<br />
+	<!-- IF False -->
+		True if<br />
+	<!-- ELSE -->
+		Not true!<br />
+	<!-- ENDIF -->
+
+	End of if's
 </body>
 
 </html>
