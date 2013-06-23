@@ -2,21 +2,21 @@ import imp
 import cherrypy
 from template import *
 
+
 class WebServer:
-
     def index(self):
+        indexPage = template.Load("index")
+        indexPage.SetVariable("Test", "Test!!!")
+        return indexPage.OutputPage()
 
-		indexPage = template.Load("index")
-		indexPage.SetVariable("Test", "Test!!!")
-		return indexPage.OutputPage()
-		
-		
+
     # Expose the index method through the web. CherryPy will never
     # publish methods that don't have the exposed attribute set to True.
     index.exposed = True
 
 
 import os.path
+
 settings = os.path.join(os.path.dirname(__file__), 'settings.conf')
 
 if __name__ == '__main__':

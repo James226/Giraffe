@@ -61,5 +61,3 @@ class TestTemplate(unittest.TestCase):
                 time.sleep(0.1)
 
         self.assertTrue(self.indexPage._shouldRecachePage(self.cachePath, self.templatePath))
-        
-        
