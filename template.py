@@ -3,26 +3,33 @@ import re
 import os.path
 
 class template:
+        def GetCachePath(self, name):
+                return 'cache/%s.py' % (name)
 
+        def GetTemplatePath(self, name):
+                return 'templates/%s.thtml' % (name)
+        
         def __init__(self):
                 pass
 
         @classmethod
 	def Load(cls, name):
                 template = cls()
-		if (not os.path.exists("cache/index.py")) or (os.path.getmtime("templates/index.thtml")) > (os.path.getmtime("cache/index.py")):
+		if template._shouldRecachePage('templates/index.thtml', 'cache/index.py'):
 			template.CachePage("index")
-		file = imp.load_source("index", "cache/index.py")
+		file = imp.load_source("index", 'cache/index.py')
 		template.page = getattr(file, "index")()
 		return template
 
+	def _shouldRecachePage(self, templateName, cacheName):
+                return (not os.path.exists(cacheName)) or (os.path.getmtime(templateName)) > (os.path.getmtime(cacheName))
 		
 	def CachePage(self, filename):
 		print("Caching file %s" % (filename))
 		with open('cache/index.py', 'w') as cache_file:
 			self._writeHeader(cache_file)
 			with open('templates/index.thtml', 'r') as template_file:
-				content = template_file.read()
+				content = template_file.readline()
 				while content != '':
 					self._writeBlock(cache_file, content)
 					content = template_file.read()
