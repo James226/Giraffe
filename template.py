@@ -4,12 +4,18 @@ import os.path
 
 class template:
 
-	def __init__(self, name):
+        def __init__(self):
+                pass
+
+        @classmethod
+	def Load(cls, name):
+                template = cls()
 		if (not os.path.exists("cache/index.py")) or (os.path.getmtime("templates/index.thtml")) > (os.path.getmtime("cache/index.py")):
-			self.CachePage("index")
+			template.CachePage("index")
 		file = imp.load_source("index", "cache/index.py")
-		self.page = file.index()
-		self.page.test = "Test"
+		template.page = getattr(file, "index")()
+		return template
+
 		
 	def CachePage(self, filename):
 		print("Caching file %s" % (filename))

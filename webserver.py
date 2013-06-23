@@ -3,11 +3,10 @@ import cherrypy
 from template import *
 
 class WebServer:
-    """ Sample request handler class. """
 
     def index(self):
 
-		indexPage = template("index")
+		indexPage = template.Load("index")
 		indexPage.SetVariable("Test", "Test!!!")
 		return indexPage.OutputPage()
 		
