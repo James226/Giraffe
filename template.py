@@ -9,26 +9,28 @@ class template:
     @classmethod
     def Load(cls, name):
         template = cls()
-        if template._shouldRecachePage('templates/index.thtml', 'cache/index.py'):
-            template.CachePage("index")
-        cachedFile = imp.load_source("index", 'cache/index.py')
-        template.page = getattr(cachedFile, "index")()
+        cls.cachePath = cls.GetCachePath(name)
+        cls.templatePath = cls.GetTemplatePath(name)
+        if template._shouldRecachePage(cls.templatePath, cls.cachePath):
+            template.CachePage(name)
+        cachedFile = imp.load_source(name, cls.cachePath)
+        template.page = getattr(cachedFile, name)()
         return template
 
     def GetCachePath(self, name):
-            return 'cache/%s.py' % (name)
+        return 'cache/%s.py' % name
 
     def GetTemplatePath(self, name):
-            return 'templates/%s.thtml' % (name)
+        return 'templates/%s.thtml' % name
 
     def _shouldRecachePage(self, templateName, cacheName):
-                return (not os.path.exists(cacheName)) or (os.path.getmtime(templateName)) > (os.path.getmtime(cacheName))
+        return (not os.path.exists(cacheName)) or (os.path.getmtime(templateName)) > (os.path.getmtime(cacheName))
 
-    def CachePage(self, filename):
-        print("Caching file %s" % (filename))
-        with open('cache/index.py', 'w') as cache_file:
-            self._writeHeader(cache_file)
-            with open('templates/index.thtml', 'r') as template_file:
+    def CachePage(self, name):
+        print("Caching file %s" % (name))
+        with open(self.cachePath, 'w') as cache_file:
+            self._writeHeader(cache_file, name)
+            with open(self.templatePath, 'r') as template_file:
                 content = template_file.readline()
                 while content != '':
                     self._writeLine(cache_file, content)
@@ -36,9 +38,9 @@ class template:
 
             self._writeFooter(cache_file)
 
-    def _writeHeader(self, stream):
+    def _writeHeader(self, stream, name):
         stream.write("import cStringIO\n\n")
-        stream.write("class index:\n\n\t")
+        stream.write("class %s:\n\n\t" % name)
         stream.write("def __init__(self):\n\t\tself.buffer = cStringIO.StringIO()\n\n")
         stream.write("\tdef OutputPage(self):\n\t\tself.buffer.write('''")
 
