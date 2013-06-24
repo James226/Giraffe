@@ -32,10 +32,11 @@ class TestTemplate(unittest.TestCase):
 
     def test_WriteHeaderShouldAddBasicHeaderImplementation(self):
         output = cStringIO.StringIO()
-        self.indexPage._writeHeader(output)
+        self.indexPage._writeHeader(output, "test")
         header = output.getvalue()
         output.close()
         self.assertRegexpMatches(header, "import cStringIO")
+        self.assertRegexpMatches(header, "class test:")
         self.assertRegexpMatches(header, "def __init__")
         self.assertRegexpMatches(header, "def OutputPage")
         self.assertRegexpMatches(header, "self.buffer = ")
@@ -58,7 +59,6 @@ class TestTemplate(unittest.TestCase):
             time.sleep(0.1)
 
         self.assertTrue(self.indexPage._shouldRecachePage(self.templatePath, self.cachePath))
-
 
     def test_ShouldRecachePageShouldReturnTrueIfCacheOlderThanTemplate(self):
         with open(self.templatePath, 'w') as templateFile:
