@@ -31,7 +31,7 @@ class template:
             with open('templates/index.thtml', 'r') as template_file:
                 content = template_file.readline()
                 while content != '':
-                    self._writeBlock(cache_file, content)
+                    self._writeLine(cache_file, content)
                     content = template_file.read()
 
             self._writeFooter(cache_file)
@@ -48,7 +48,7 @@ class template:
         stream.write("\t\tself.buffer.close()\n")
         stream.write("\t\treturn output\n\n")
 
-    def _writeBlock(self, stream, content):
+    def _writeLine(self, stream, content):
         content = re.sub("{([a-zA-Z0-9_-]+)}", "''')\n\t\tself.buffer.write(self.\\1)\n\t\tself.buffer.write('''", content)
         content = re.sub("<!-- IF ([a-zA-Z0-9\s=\!]+) -->", "''')\n\t\tif \\1:\n\t\t\tself.buffer.write('''", content)
         content = re.sub("<!-- ELSE -->", "''')\n\t\telse:\n\t\t\tself.buffer.write('''", content)
