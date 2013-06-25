@@ -38,9 +38,10 @@ class template:
             self._writeFooter(cache_file)
 
     def _writeHeader(self, stream, name):
-        stream.write("import cStringIO\n\n")
-        stream.write("class %s:\n\n\t" % name)
-        stream.write("def __init__(self):\n\t\tself.buffer = cStringIO.StringIO()\n\n")
+        stream.write("import cache.Page\n\n")
+        stream.write("class %s(cache.Page.Page):\n\n\t" % name)
+        stream.write("def __init__(self):\n")
+        stream.write("\t\tsuper(index, self).__init__()\n\n")
         stream.write("\tdef OutputPage(self):\n")
 
     def _writeFooter(self, stream):
