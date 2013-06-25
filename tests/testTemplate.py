@@ -87,7 +87,7 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '<!-- ELSE -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\telse:\n")
+        self.assertEqual(header, "\telse:\n")
 
     def test_WriteLineShouldReplaceEndIfBlocks(self):
         output = cStringIO.StringIO()
@@ -130,4 +130,4 @@ class TestTemplate(unittest.TestCase):
                          "\t\t\tself.buffer.write('''\nIs True:''')\n" +
                          "\t\t\tif False:\n"
                          "\t\t\t\tself.buffer.write('''Unreachable Code''')\n\n" +
-                         "\t\t\t\tself.buffer.write('''\n''')\n\n")
+                         "\t\t\tself.buffer.write('''\n''')\n\n")

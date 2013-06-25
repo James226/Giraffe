@@ -11,15 +11,17 @@
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
-	<!-- IF False -->
-		True if<br />
-	<!-- ELSE -->
-	    <!-- IF True -->
-		    Very true!<br />
+	<!-- IF self.Test != None -->
+	    <!-- IF self.Test == "Test!!!" -->
+		    Test is 'Test'<br />
+		<!-- ELSE -->
+		    Test = ' {Test} '
 		<!-- ENDIF -->
+	<!-- ELSE -->
+		Test Not Set!<br />
 	<!-- ENDIF -->
 
-	End of if's
+	End of page.
 </body>
 
 </html>
