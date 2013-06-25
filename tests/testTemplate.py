@@ -35,12 +35,10 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeHeader(output, "test")
         header = output.getvalue()
         output.close()
-        self.assertRegexpMatches(header, "import cStringIO")
-        self.assertRegexpMatches(header, "import Page")
-        self.assertRegexpMatches(header, "class test\(Page\):")
+        self.assertRegexpMatches(header, "import cache.Page")
+        self.assertRegexpMatches(header, "class test\(cache.Page.Page\):")
         self.assertRegexpMatches(header, "def __init__")
         self.assertRegexpMatches(header, "def OutputPage")
-        self.assertRegexpMatches(header, "self.buffer = ")
 
     def test_WriteFooterShouldCloseOutputBuffer(self):
         output = cStringIO.StringIO()
@@ -59,7 +57,7 @@ class TestTemplate(unittest.TestCase):
         with open(self.templatePath, 'w') as templateFile:
             time.sleep(0.1)
 
-        self.assertTrue(self.indexPage._shouldRecachePage(self.templatePath, self.cachePath))
+        self.assertTrue(self.indexPage._shouldCachePage(self.templatePath, self.cachePath))
 
     def test_ShouldRecachePageShouldReturnTrueIfCacheOlderThanTemplate(self):
         with open(self.templatePath, 'w') as templateFile:
@@ -67,7 +65,7 @@ class TestTemplate(unittest.TestCase):
             with open(self.cachePath, 'w') as cacheFile:
                 time.sleep(0.1)
 
-        self.assertTrue(self.indexPage._shouldRecachePage(self.cachePath, self.templatePath))
+        self.assertTrue(self.indexPage._shouldCachePage(self.cachePath, self.templatePath))
 
     def test_WriteLineShouldReplaceVariables(self):
         output = cStringIO.StringIO()

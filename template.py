@@ -11,7 +11,7 @@ class template:
         template = cls()
         cls.cachePath = template.GetCachePath(name)
         cls.templatePath = template.GetTemplatePath(name)
-        if template._shouldRecachePage(template.templatePath, template.cachePath):
+        if template._shouldCachePage(template.templatePath, template.cachePath):
             template.CachePage(name)
         cachedFile = imp.load_source(name, template.cachePath)
         template.page = getattr(cachedFile, name)()
@@ -23,7 +23,7 @@ class template:
     def GetTemplatePath(self, name):
         return 'templates/%s.thtml' % name
 
-    def _shouldRecachePage(self, templateName, cacheName):
+    def _shouldCachePage(self, templateName, cacheName):
         return (not os.path.exists(cacheName)) or (os.path.getmtime(templateName)) > (os.path.getmtime(cacheName))
 
     def CachePage(self, name):
