@@ -51,7 +51,7 @@ class template:
 
     def _writeLine(self, stream, content):
         currentPosition = 0
-        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF)\s?([a-zA-Z0-9\s=\!]+) -->", content)
+        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF)(\s([a-zA-Z0-9\s=!]+))? -->", content)
         for match in replacementMatches:
             if match.start() - currentPosition > 0:
                 self._processHTML(stream, content[currentPosition:match.start()])
@@ -75,7 +75,7 @@ class template:
 
     def _processStatement(self, stream, match):
         if match.group(2) == "IF":
-            stream.write("\t\tif " + match.group(3) + ":\n\t")
+            stream.write("\t\tif " + match.group(4) + ":\n\t")
         elif match.group(2) == "ELSE":
             stream.write("\t\telse:\n\t")
         elif match.group(2) == "ENDIF":
