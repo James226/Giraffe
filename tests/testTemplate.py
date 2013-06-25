@@ -73,25 +73,25 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '{Test}')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "''')\n\t\tself.buffer.write(self.Test)\n\t\tself.buffer.write('''")
+        self.assertEqual(header, "\t\tself.buffer.write(self.Test)\n")
 
     def test_WriteLineShouldReplaceIfBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- IF True -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "''')\n\t\tif True:\n\t\t\tself.buffer.write('''")
+        self.assertEqual(header, "\t\tif True:\n\t")
 
     def test_WriteLineShouldReplaceElseBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- ELSE -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "''')\n\t\telse:\n\t\t\tself.buffer.write('''")
+        self.assertEqual(header, "\t\telse:\n\t")
 
     def test_WriteLineShouldReplaceEndIfBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- ENDIF -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "''')\n\t\tself.buffer.write('''")
+        self.assertEqual(header, "\n")

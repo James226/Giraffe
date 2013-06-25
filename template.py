@@ -62,7 +62,8 @@ class template:
                 self._processStatement(stream, match)
 
             currentPosition = match.end()
-        self._processHTML(stream, content[currentPosition:])
+        if len(content) > currentPosition:
+            self._processHTML(stream, content[currentPosition:])
 
     def _processHTML(self, stream, content):
         stream.write("\t\tself.buffer.write('''")
