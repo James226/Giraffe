@@ -73,49 +73,49 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '{Test}')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\tself.buffer.write(self.Test)\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Test)\n")
 
     def test_WriteLineShouldReplaceIfBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- IF True -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\tif True:\n")
+        self.assertSequenceEqual(header, "\t\tif True:\n")
 
     def test_WriteLineShouldReplaceElseBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- ELSE -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\telse:\n")
+        self.assertSequenceEqual(header, "\telse:\n")
 
     def test_WriteLineShouldReplaceEndIfBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- ENDIF -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\n")
+        self.assertSequenceEqual(header, "\n")
 
     def test_WriteLineShouldWriteContentBeforeVariables(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, 'Testing{Variable}')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Variable)\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Variable)\n")
 
     def test_WriteLineShouldWriteContentAfterVariables(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '{Variable}Testing')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\tself.buffer.write(self.Variable)\n\t\tself.buffer.write('''Testing''')\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Variable)\n\t\tself.buffer.write('''Testing''')\n")
 
     def test_WriteLineShouldWriteContentBetweenVariables(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, 'TextBefore{Variable}TextAfter')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header,
+        self.assertSequenceEqual(header,
                          "\t\tself.buffer.write('''TextBefore''')\n" +
                          "\t\tself.buffer.write(self.Variable)\n" +
                          "\t\tself.buffer.write('''TextAfter''')\n")
@@ -125,9 +125,18 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '<!-- IF True -->\nIs True:<!-- IF False -->Unreachable Code<!-- ENDIF -->\n<!-- ENDIF -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header,
+        self.assertSequenceEqual(header,
                          "\t\tif True:\n"
                          "\t\t\tself.buffer.write('''\nIs True:''')\n" +
                          "\t\t\tif False:\n"
                          "\t\t\t\tself.buffer.write('''Unreachable Code''')\n\n" +
                          "\t\t\tself.buffer.write('''\n''')\n\n")
+
+    def test_WriteLineShouldReplaceBeginAndEndStatements(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- BEGIN TestNest -->Data<!-- END TestNest -->')
+        header = output.getvalue()
+        output.close()
+        self.assertSequenceEqual(header,
+                         "\t\tfor TestNest in self.Nests['TestNest']:\n" +
+                         "\t\t\tself.buffer.write('''Data''')\n\n")
