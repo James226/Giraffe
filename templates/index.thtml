@@ -15,7 +15,7 @@
 	    <!-- IF Test -->
 		    Test is 'Test'<br />
 		<!-- ELSE -->
-		    Test = ' {Test} '
+		    Test = None
 		<!-- ENDIF -->
 	<!-- ELSE -->
 		Test Not Set!<br />

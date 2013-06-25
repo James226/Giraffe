@@ -110,8 +110,8 @@ class template:
 
     def AddNest(self, nestName, variables=()):
         if not nestName in self.page.Nests:
-            self.page.Nests[nestName] = {}
-        self.page.Nests[nestName][len(self.page.Nests[nestName])] = variables
+            self.page.Nests[nestName] = []
+        self.page.Nests[nestName].append(variables)
 
     def OutputPage(self):
         return self.page.OutputPage()
