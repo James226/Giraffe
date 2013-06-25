@@ -76,10 +76,10 @@ class TestTemplate(unittest.TestCase):
 
     def test_WriteLineShouldReplaceIfBlocks(self):
         output = cStringIO.StringIO()
-        self.indexPage._writeLine(output, '<!-- IF True -->')
+        self.indexPage._writeLine(output, '<!-- IF Var -->')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tif True:\n")
+        self.assertSequenceEqual(header, "\t\tif self.Nests['']['Var']:\n")
 
     def test_WriteLineShouldReplaceElseBlocks(self):
         output = cStringIO.StringIO()
@@ -121,13 +121,13 @@ class TestTemplate(unittest.TestCase):
 
     def test_WriteLineShouldAddExtraIndentForNestedIf(self):
         output = cStringIO.StringIO()
-        self.indexPage._writeLine(output, '<!-- IF True -->\nIs True:<!-- IF False -->Unreachable Code<!-- ENDIF -->\n<!-- ENDIF -->')
+        self.indexPage._writeLine(output, '<!-- IF Test -->\nIs True:<!-- IF Value -->Unreachable Code<!-- ENDIF -->\n<!-- ENDIF -->')
         header = output.getvalue()
         output.close()
         self.assertSequenceEqual(header,
-                         "\t\tif True:\n"
+                         "\t\tif self.Nests['']['Test']:\n"
                          "\t\t\tself.buffer.write('''\nIs True:''')\n" +
-                         "\t\t\tif False:\n"
+                         "\t\t\tif self.Nests['']['Value']:\n"
                          "\t\t\t\tself.buffer.write('''Unreachable Code''')\n\n" +
                          "\t\t\tself.buffer.write('''\n''')\n\n")
 

@@ -11,8 +11,8 @@
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
-	<!-- IF self.Nests['']['Test'] != None -->
-	    <!-- IF self.Nests['']['Test'] == "Test!!!" -->
+	<!-- IF Test -->
+	    <!-- IF Test -->
 		    Test is 'Test'<br />
 		<!-- ELSE -->
 		    Test = ' {Test} '
@@ -20,6 +20,10 @@
 	<!-- ELSE -->
 		Test Not Set!<br />
 	<!-- ENDIF -->
+
+	<!-- BEGIN Nest -->
+	    This is a test nest<br />
+	<!-- END Nest -->
 
 	End of page.
 </body>

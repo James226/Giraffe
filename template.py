@@ -2,6 +2,7 @@ import imp
 import re
 import os.path
 
+
 class template:
     def __init__(self):
         self.currentTab = 2
@@ -53,7 +54,8 @@ class template:
 
     def _writeLine(self, stream, content):
         currentPosition = 0
-        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9\s=!\"'\.\[\]]+))? -->", content)
+        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9]+))? -->",
+                                         content)
         for match in replacementMatches:
             if match.start() - currentPosition > 0:
                 self._processHTML(stream, content[currentPosition:match.start()])
@@ -77,7 +79,7 @@ class template:
 
     def _processStatement(self, stream, match):
         if match.group(2) == "IF":
-            stream.write(self._getTabs() + "if " + match.group(4) + ":\n")
+            stream.write(self._getTabs() + "if self.Nests['']['" + match.group(4) + "']:\n")
             self._incrementTab()
         elif match.group(2) == "ELSE":
             self._decrementTab()
@@ -91,6 +93,7 @@ class template:
             self._incrementTab()
         elif match.group(2) == "END":
             stream.write("\n")
+            self._decrementTab()
         pass
 
     def _getTabs(self):
@@ -104,6 +107,11 @@ class template:
 
     def SetVariable(self, name, value):
         self.page.Nests[''][name] = value
+
+    def AddNest(self, nestName, variables=()):
+        if not nestName in self.page.Nests:
+            self.page.Nests[nestName] = {}
+        self.page.Nests[nestName][len(self.page.Nests[nestName])] = variables
 
     def OutputPage(self):
         return self.page.OutputPage()
