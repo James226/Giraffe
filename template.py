@@ -4,7 +4,7 @@ import os.path
 
 class template:
     def __init__(self):
-            pass
+            self.currentTab = 2
 
     @classmethod
     def Load(cls, name):
@@ -66,22 +66,28 @@ class template:
             self._processHTML(stream, content[currentPosition:])
 
     def _processHTML(self, stream, content):
-        stream.write("\t\tself.buffer.write('''")
+        stream.write(self._getTabs() + "self.buffer.write('''")
         stream.write(content)
         stream.write("''')\n")
 
     def _processVariable(self, stream, match):
         stream.write("\t\tself.buffer.write(self." + match.group(1) + ")\n")
-        pass
 
     def _processStatement(self, stream, match):
         if match.group(2) == "IF":
-            stream.write("\t\tif " + match.group(4) + ":\n\t")
+            stream.write(self._getTabs() + "if " + match.group(4) + ":\n")
+            self.currentTab += 1
         elif match.group(2) == "ELSE":
-            stream.write("\t\telse:\n\t")
+            self.currentTab -= 1
+            stream.write(self._getTabs() + "else:\n")
+            self.currentTab += 1
         elif match.group(2) == "ENDIF":
             stream.write("\n")
+            self.currentTab -= 1
         pass
+
+    def _getTabs(self):
+        return '\t' * self.currentTab
 
     def SetVariable(self, name, value):
         setattr(self.page, name, value)

@@ -6,7 +6,7 @@
 
 <body>
 	This is a real 
-	{Test}<br />
+	&#123;Test&#125;<br />
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
@@ -14,7 +14,9 @@
 	<!-- IF False -->
 		True if<br />
 	<!-- ELSE -->
-		Not true!<br />
+	    <!-- IF True -->
+		    Very true!<br />
+		<!-- ENDIF -->
 	<!-- ENDIF -->
 
 	End of if's

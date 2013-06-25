@@ -6,8 +6,8 @@ import time
 import random
 from template import *
 
-class TestTemplate(unittest.TestCase):
 
+class TestTemplate(unittest.TestCase):
     def setUp(self):
         self.indexPage = template()
         name = 'test_' + str(random.randint(10000, 20000))
@@ -80,14 +80,14 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '<!-- IF True -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\tif True:\n\t")
+        self.assertEqual(header, "\t\tif True:\n")
 
     def test_WriteLineShouldReplaceElseBlocks(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '<!-- ELSE -->')
         header = output.getvalue()
         output.close()
-        self.assertEqual(header, "\t\telse:\n\t")
+        self.assertEqual(header, "\t\telse:\n")
 
     def test_WriteLineShouldReplaceEndIfBlocks(self):
         output = cStringIO.StringIO()
@@ -95,3 +95,39 @@ class TestTemplate(unittest.TestCase):
         header = output.getvalue()
         output.close()
         self.assertEqual(header, "\n")
+
+    def test_WriteLineShouldWriteContentBeforeVariables(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, 'Testing{Variable}')
+        header = output.getvalue()
+        output.close()
+        self.assertEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Variable)\n")
+
+    def test_WriteLineShouldWriteContentAfterVariables(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '{Variable}Testing')
+        header = output.getvalue()
+        output.close()
+        self.assertEqual(header, "\t\tself.buffer.write(self.Variable)\n\t\tself.buffer.write('''Testing''')\n")
+
+    def test_WriteLineShouldWriteContentBetweenVariables(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, 'TextBefore{Variable}TextAfter')
+        header = output.getvalue()
+        output.close()
+        self.assertEqual(header,
+                         "\t\tself.buffer.write('''TextBefore''')\n" +
+                         "\t\tself.buffer.write(self.Variable)\n" +
+                         "\t\tself.buffer.write('''TextAfter''')\n")
+
+    def test_WriteLineShouldAddExtraIndentForNestedIf(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- IF True -->\nIs True:<!-- IF False -->Unreachable Code<!-- ENDIF -->\n<!-- ENDIF -->')
+        header = output.getvalue()
+        output.close()
+        self.assertEqual(header,
+                         "\t\tif True:\n"
+                         "\t\t\tself.buffer.write('''\nIs True:''')\n" +
+                         "\t\t\tif False:\n"
+                         "\t\t\t\tself.buffer.write('''Unreachable Code''')\n\n" +
+                         "\t\t\t\tself.buffer.write('''\n''')\n\n")
