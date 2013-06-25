@@ -11,8 +11,8 @@
 	{Test}<br />
 	{Test}<br />
 	{Test}<br />
-	<!-- IF self.Test != None -->
-	    <!-- IF self.Test == "Test!!!" -->
+	<!-- IF self.Nests['']['Test'] != None -->
+	    <!-- IF self.Nests['']['Test'] == "Test!!!" -->
 		    Test is 'Test'<br />
 		<!-- ELSE -->
 		    Test = ' {Test} '

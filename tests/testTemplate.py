@@ -72,7 +72,7 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '{Test}')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Test)\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Nests['']['Test'])\n")
 
     def test_WriteLineShouldReplaceIfBlocks(self):
         output = cStringIO.StringIO()
@@ -100,14 +100,14 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, 'Testing{Variable}')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Variable)\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Nests['']['Variable'])\n")
 
     def test_WriteLineShouldWriteContentAfterVariables(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '{Variable}Testing')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Variable)\n\t\tself.buffer.write('''Testing''')\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Nests['']['Variable'])\n\t\tself.buffer.write('''Testing''')\n")
 
     def test_WriteLineShouldWriteContentBetweenVariables(self):
         output = cStringIO.StringIO()
@@ -116,7 +116,7 @@ class TestTemplate(unittest.TestCase):
         output.close()
         self.assertSequenceEqual(header,
                          "\t\tself.buffer.write('''TextBefore''')\n" +
-                         "\t\tself.buffer.write(self.Variable)\n" +
+                         "\t\tself.buffer.write(self.Nests['']['Variable'])\n" +
                          "\t\tself.buffer.write('''TextAfter''')\n")
 
     def test_WriteLineShouldAddExtraIndentForNestedIf(self):

@@ -4,7 +4,8 @@ import os.path
 
 class template:
     def __init__(self):
-            self.currentTab = 2
+        self.currentTab = 2
+        self.page = None
 
     @classmethod
     def Load(cls, name):
@@ -52,7 +53,7 @@ class template:
 
     def _writeLine(self, stream, content):
         currentPosition = 0
-        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9\s=!\"'\.]+))? -->", content)
+        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9\s=!\"'\.\[\]]+))? -->", content)
         for match in replacementMatches:
             if match.start() - currentPosition > 0:
                 self._processHTML(stream, content[currentPosition:match.start()])
@@ -72,7 +73,7 @@ class template:
         stream.write("''')\n")
 
     def _processVariable(self, stream, match):
-        stream.write(self._getTabs() + "self.buffer.write(self." + match.group(1) + ")\n")
+        stream.write(self._getTabs() + "self.buffer.write(self.Nests['']['" + match.group(1) + "'])\n")
 
     def _processStatement(self, stream, match):
         if match.group(2) == "IF":
@@ -86,7 +87,7 @@ class template:
             stream.write("\n")
             self._decrementTab()
         elif match.group(2) == "BEGIN":
-            stream.write(self._getTabs() + "for TestNest in self.Nests['TestNest']:\n")
+            stream.write(self._getTabs() + "for " + match.group(4) + " in self.Nests['" + match.group(4) + "']:\n")
             self._incrementTab()
         elif match.group(2) == "END":
             stream.write("\n")
@@ -102,7 +103,7 @@ class template:
         self.currentTab -= 1
 
     def SetVariable(self, name, value):
-        setattr(self.page, name, value)
+        self.page.Nests[''][name] = value
 
     def OutputPage(self):
         return self.page.OutputPage()
