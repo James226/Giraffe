@@ -35,9 +35,10 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeHeader(output, "test")
         header = output.getvalue()
         output.close()
-        self.assertRegexpMatches(header, "import cache.Page")
-        self.assertRegexpMatches(header, "class test\(cache.Page.Page\):")
+        self.assertRegexpMatches(header, "import cache\.Page")
+        self.assertRegexpMatches(header, "class test\(cache\.Page\.Page\):")
         self.assertRegexpMatches(header, "def __init__")
+        self.assertRegexpMatches(header, "super\(test, self\)\.__init__\(\)")
         self.assertRegexpMatches(header, "def OutputPage")
 
     def test_WriteFooterShouldCloseOutputBuffer(self):

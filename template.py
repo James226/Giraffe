@@ -43,7 +43,7 @@ class template:
         stream.write("import cache.Page\n\n")
         stream.write("class %s(cache.Page.Page):\n\n\t" % name)
         stream.write("def __init__(self):\n")
-        stream.write("\t\tsuper(index, self).__init__()\n\n")
+        stream.write("\t\tsuper(%s, self).__init__()\n\n" % name)
         stream.write("\tdef OutputPage(self):\n")
 
     def _writeFooter(self, stream):
