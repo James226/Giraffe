@@ -7,8 +7,9 @@ class WebServer:
     def index(self):
         indexPage = template.Load("index")
         indexPage.SetVariable("Test", "Test!!!")
-        indexPage.AddNest("Nest")
-        indexPage.AddNest("Nest")
+        test = indexPage.AddNest("Nest", {})
+        indexPage.AddSubNest(test, "NestedNest", {})
+        indexPage.AddNest("Nest", {})
         return indexPage.OutputPage()
 
 

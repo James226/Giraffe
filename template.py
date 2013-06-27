@@ -123,14 +123,16 @@ class template:
     def SetVariable(self, name, value):
         self.page.Nests[''][name] = value
 
-    def AddNest(self, nestName, variables=()):
-        currentNest = self.page.Nests
-        #for currentNestName in nestName.split('.'):
-        #    currentNest = currentNest[currentNestName]
+    def AddNest(self, nestName, variables):
+        self.AddSubNest(self.page.Nests, nestName, variables)
+        return variables
 
-        if not nestName in currentNest:
-            currentNest[nestName] = []
-        currentNest[nestName].append(variables)
+    def AddSubNest(self, parentNest, nestName, variables):
+        if not nestName in parentNest:
+            parentNest[nestName] = []
+
+        parentNest[nestName].append(variables)
+        return variables
 
     def OutputPage(self):
         return self.page.OutputPage()
