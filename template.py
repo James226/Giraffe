@@ -91,9 +91,13 @@ class template:
             self._decrementTab()
         elif match.group(2) == "BEGIN":
             if len(self.currentNest) == 0:
+                stream.write(self._getTabs() + "if '" + match.group(4) + "' in self.Nests:\n")
+                self._incrementTab()
                 stream.write(self._getTabs() + "for " + match.group(4) + " in self.Nests['" + match.group(4) + "']:\n")
             else:
                 parentNest = '_'.join(self.currentNest)
+                stream.write(self._getTabs() + "if '" + match.group(4) + "' in " + parentNest + ":\n")
+                self._incrementTab()
                 stream.write(self._getTabs() + "for " + parentNest + '_' + match.group(4) + " in " + parentNest + "['" + match.group(4) + "']:\n")
             self.currentNest.append(match.group(4))
             self._incrementTab()
@@ -101,11 +105,11 @@ class template:
             if len(self.currentNest) > 0 and self.currentNest.pop() == match.group(4):
                 stream.write("\n")
                 self._decrementTab()
+                self._decrementTab()
             else:
                 print("Invalid template syntax. Attempted to end nest %s. Current Nest Structure: %s",
                       match.group(4),
                       '.'.join(self.currentNest))
-        pass
 
     def _getTabs(self):
         return '\t' * self.currentTab
@@ -121,8 +125,8 @@ class template:
 
     def AddNest(self, nestName, variables=()):
         currentNest = self.page.Nests
-        for currentNestName in nestName.split('.'):
-            currentNest = currentNest[currentNestName]
+        #for currentNestName in nestName.split('.'):
+        #    currentNest = currentNest[currentNestName]
 
         if not nestName in currentNest:
             currentNest[nestName] = []

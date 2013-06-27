@@ -22,7 +22,11 @@
 	<!-- ENDIF -->
 
 	<!-- BEGIN Nest -->
-	    This is a test nest<br />
+	    Begin Nest.<br />
+	    <!-- BEGIN NestedNest -->
+	        Nested Nest<br />
+	    <!-- END NestedNest -->
+	    End Nest.<br />
 	<!-- END Nest -->
 
 	End of page.
