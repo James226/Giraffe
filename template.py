@@ -7,6 +7,7 @@ class template:
     def __init__(self):
         self.currentTab = 2
         self.page = None
+        self.currentNest = []
 
     @classmethod
     def Load(cls, name):
@@ -89,11 +90,21 @@ class template:
             stream.write("\n")
             self._decrementTab()
         elif match.group(2) == "BEGIN":
-            stream.write(self._getTabs() + "for " + match.group(4) + " in self.Nests['" + match.group(4) + "']:\n")
+            if len(self.currentNest) == 0:
+                stream.write(self._getTabs() + "for " + match.group(4) + " in self.Nests['" + match.group(4) + "']:\n")
+            else:
+                parentNest = '_'.join(self.currentNest)
+                stream.write(self._getTabs() + "for " + parentNest + '_' + match.group(4) + " in " + parentNest + "['" + match.group(4) + "']:\n")
+            self.currentNest.append(match.group(4))
             self._incrementTab()
         elif match.group(2) == "END":
-            stream.write("\n")
-            self._decrementTab()
+            if len(self.currentNest) > 0 and self.currentNest.pop() == match.group(4):
+                stream.write("\n")
+                self._decrementTab()
+            else:
+                print("Invalid template syntax. Attempted to end nest %s. Current Nest Structure: %s",
+                      match.group(4),
+                      '.'.join(self.currentNest))
         pass
 
     def _getTabs(self):
@@ -109,9 +120,13 @@ class template:
         self.page.Nests[''][name] = value
 
     def AddNest(self, nestName, variables=()):
-        if not nestName in self.page.Nests:
-            self.page.Nests[nestName] = []
-        self.page.Nests[nestName].append(variables)
+        currentNest = self.page.Nests
+        for currentNestName in nestName.split('.'):
+            currentNest = currentNest[currentNestName]
+
+        if not nestName in currentNest:
+            currentNest[nestName] = []
+        currentNest[nestName].append(variables)
 
     def OutputPage(self):
         return self.page.OutputPage()

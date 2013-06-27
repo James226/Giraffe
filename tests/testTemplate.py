@@ -140,3 +140,13 @@ class TestTemplate(unittest.TestCase):
         self.assertSequenceEqual(header,
                          "\t\tfor TestNest in self.Nests['TestNest']:\n" +
                          "\t\t\tself.buffer.write('''Data''')\n\n")
+
+    def test_WriteLineShouldReplaceNestedBeginAndEndStatements(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- BEGIN TestNest --><!-- BEGIN NestedNest -->Data<!-- END NestedNest --><!-- END TestNest -->')
+        header = output.getvalue()
+        output.close()
+        self.assertSequenceEqual(header,
+                         "\t\tfor TestNest in self.Nests['TestNest']:\n" +
+                         "\t\t\tfor TestNest_NestedNest in TestNest['NestedNest']:\n"
+                         "\t\t\t\tself.buffer.write('''Data''')\n\n\n")
