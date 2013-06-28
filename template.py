@@ -55,13 +55,13 @@ class template:
 
     def _writeLine(self, stream, content):
         currentPosition = 0
-        replacementMatches = re.finditer("{([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9]+))? -->",
+        replacementMatches = re.finditer("{(([A-Za-z0-9]+)\.)?([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9]+))? -->",
                                          content)
         for match in replacementMatches:
             if match.start() - currentPosition > 0:
                 self._processHTML(stream, content[currentPosition:match.start()])
 
-            if match.group(1) is not None:
+            if match.group(3) is not None:
                 self._processVariable(stream, match)
             else:
                 self._processStatement(stream, match)
@@ -76,39 +76,53 @@ class template:
         stream.write("''')\n")
 
     def _processVariable(self, stream, match):
-        stream.write(self._getTabs() + "self.buffer.write(self.Nests['']['" + match.group(1) + "'])\n")
+        if match.group(1) is not None:
+            index = self.currentNest.index(match.group(2))
+            if index is not None:
+                nestVariable = '_'.join(self.currentNest[:index+1])
+                stream.write(self._getTabs() + "if '" + match.group(3) + "' in " + nestVariable + ":\n")
+                self._incrementTab()
+                stream.write(self._getTabs() + "self.buffer.write(" + nestVariable + "['" + match.group(3) + "'])\n")
+                self._decrementTab()
+            else:
+                stream.write("self.buffer.write('''" + match.group(0) + "'''")
+        else:
+            stream.write(self._getTabs() + "if '" + match.group(3) + "' in self.Nests['']:\n")
+            self._incrementTab()
+            stream.write(self._getTabs() + "self.buffer.write(self.Nests['']['" + match.group(3) + "'])\n")
+            self._decrementTab()
 
     def _processStatement(self, stream, match):
-        if match.group(2) == "IF":
-            stream.write(self._getTabs() + "if self.Nests['']['" + match.group(4) + "']:\n")
+        if match.group(4) == "IF":
+            stream.write(self._getTabs() + "if self.Nests['']['" + match.group(6) + "']:\n")
             self._incrementTab()
-        elif match.group(2) == "ELSE":
+        elif match.group(4) == "ELSE":
             self._decrementTab()
             stream.write(self._getTabs() + "else:\n")
             self._incrementTab()
-        elif match.group(2) == "ENDIF":
+        elif match.group(4) == "ENDIF":
             stream.write("\n")
             self._decrementTab()
-        elif match.group(2) == "BEGIN":
+        elif match.group(4) == "BEGIN":
             if len(self.currentNest) == 0:
-                stream.write(self._getTabs() + "if '" + match.group(4) + "' in self.Nests:\n")
+                stream.write(self._getTabs() + "if '" + match.group(6) + "' in self.Nests:\n")
                 self._incrementTab()
-                stream.write(self._getTabs() + "for " + match.group(4) + " in self.Nests['" + match.group(4) + "']:\n")
+                stream.write(self._getTabs() + "for " + match.group(6) + " in self.Nests['" + match.group(6) + "']:\n")
             else:
                 parentNest = '_'.join(self.currentNest)
-                stream.write(self._getTabs() + "if '" + match.group(4) + "' in " + parentNest + ":\n")
+                stream.write(self._getTabs() + "if '" + match.group(6) + "' in " + parentNest + ":\n")
                 self._incrementTab()
-                stream.write(self._getTabs() + "for " + parentNest + '_' + match.group(4) + " in " + parentNest + "['" + match.group(4) + "']:\n")
-            self.currentNest.append(match.group(4))
+                stream.write(self._getTabs() + "for " + parentNest + '_' + match.group(6) + " in " + parentNest + "['" + match.group(6) + "']:\n")
+            self.currentNest.append(match.group(6))
             self._incrementTab()
-        elif match.group(2) == "END":
-            if len(self.currentNest) > 0 and self.currentNest.pop() == match.group(4):
+        elif match.group(4) == "END":
+            if len(self.currentNest) > 0 and self.currentNest.pop() == match.group(6):
                 stream.write("\n")
                 self._decrementTab()
                 self._decrementTab()
             else:
                 print("Invalid template syntax. Attempted to end nest %s. Current Nest Structure: %s",
-                      match.group(4),
+                      match.group(6),
                       '.'.join(self.currentNest))
 
     def _getTabs(self):

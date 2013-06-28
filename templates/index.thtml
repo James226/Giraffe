@@ -22,9 +22,9 @@
 	<!-- ENDIF -->
 
 	<!-- BEGIN Nest -->
-	    Begin Nest.<br />
+	    Begin Nest: {Nest.NestTitle}<br />
 	    <!-- BEGIN NestedNest -->
-	        Nested Nest<br />
+	        Nested Nest: {NestedNest.NestContent}<br />
 	    <!-- END NestedNest -->
 	    End Nest.<br />
 	<!-- END Nest -->

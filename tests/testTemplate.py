@@ -73,7 +73,7 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '{Test}')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Nests['']['Test'])\n")
+        self.assertSequenceEqual(header, "\t\tif 'Test' in self.Nests['']:\n\t\t\tself.buffer.write(self.Nests['']['Test'])\n")
 
     def test_WriteLineShouldReplaceIfBlocks(self):
         output = cStringIO.StringIO()
@@ -101,14 +101,18 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, 'Testing{Variable}')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write('''Testing''')\n\t\tself.buffer.write(self.Nests['']['Variable'])\n")
+        self.assertSequenceEqual(header, "\t\tself.buffer.write('''Testing''')\n" +
+                                         "\t\tif 'Variable' in self.Nests['']:\n" +
+                                         "\t\t\tself.buffer.write(self.Nests['']['Variable'])\n")
 
     def test_WriteLineShouldWriteContentAfterVariables(self):
         output = cStringIO.StringIO()
         self.indexPage._writeLine(output, '{Variable}Testing')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tself.buffer.write(self.Nests['']['Variable'])\n\t\tself.buffer.write('''Testing''')\n")
+        self.assertSequenceEqual(header, "\t\tif 'Variable' in self.Nests['']:\n" +
+                                         "\t\t\tself.buffer.write(self.Nests['']['Variable'])\n" +
+                                         "\t\tself.buffer.write('''Testing''')\n")
 
     def test_WriteLineShouldWriteContentBetweenVariables(self):
         output = cStringIO.StringIO()
@@ -117,7 +121,8 @@ class TestTemplate(unittest.TestCase):
         output.close()
         self.assertSequenceEqual(header,
                          "\t\tself.buffer.write('''TextBefore''')\n" +
-                         "\t\tself.buffer.write(self.Nests['']['Variable'])\n" +
+                         "\t\tif 'Variable' in self.Nests['']:\n" +
+                         "\t\t\tself.buffer.write(self.Nests['']['Variable'])\n" +
                          "\t\tself.buffer.write('''TextAfter''')\n")
 
     def test_WriteLineShouldAddExtraIndentForNestedIf(self):
@@ -153,3 +158,28 @@ class TestTemplate(unittest.TestCase):
                          "\t\t\t\tif 'NestedNest' in TestNest:\n"
                          "\t\t\t\t\tfor TestNest_NestedNest in TestNest['NestedNest']:\n"
                          "\t\t\t\t\t\tself.buffer.write('''Data''')\n\n\n")
+
+    def test_WriteLineShouldReplaceVariablesWithinNests(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- BEGIN TestNest -->{TestNest.Variable}<!-- END TestNest -->')
+        header = output.getvalue()
+        output.close()
+        self.assertSequenceEqual(header,
+                         "\t\tif 'TestNest' in self.Nests:\n" +
+                         "\t\t\tfor TestNest in self.Nests['TestNest']:\n" +
+                         "\t\t\t\tif 'Variable' in TestNest:\n" +
+                         "\t\t\t\t\tself.buffer.write(TestNest['Variable'])\n\n")
+
+    def test_WriteLineShouldReplaceVariablesWithinNestedNests(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- BEGIN TestNest --><!-- BEGIN NestedNest -->{NestedNest.Variable}<!-- END NestedNest --><!-- END TestNest -->')
+        header = output.getvalue()
+        output.close()
+        self.maxDiff = None
+        self.assertSequenceEqual(header,
+                         "\t\tif 'TestNest' in self.Nests:\n" +
+                         "\t\t\tfor TestNest in self.Nests['TestNest']:\n" +
+                         "\t\t\t\tif 'NestedNest' in TestNest:\n"
+                         "\t\t\t\t\tfor TestNest_NestedNest in TestNest['NestedNest']:\n"
+                         "\t\t\t\t\t\tif 'Variable' in TestNest_NestedNest:\n" +
+                         "\t\t\t\t\t\t\tself.buffer.write(TestNest_NestedNest['Variable'])\n\n\n")
