@@ -55,7 +55,7 @@ class template:
 
     def _writeLine(self, stream, content):
         currentPosition = 0
-        replacementMatches = re.finditer("{(([A-Za-z0-9]+)\.)?([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9]+))? -->",
+        replacementMatches = re.finditer("{(([A-Za-z0-9]+)\.)?([a-zA-Z0-9_-]+)}|<!-- (IF|ELSE|ENDIF|BEGIN|END)(\s([a-zA-Z0-9\.]+))? -->",
                                          content)
         for match in replacementMatches:
             if match.start() - currentPosition > 0:
@@ -94,8 +94,16 @@ class template:
 
     def _processStatement(self, stream, match):
         if match.group(4) == "IF":
-            stream.write(self._getTabs() + "if self.Nests['']['" + match.group(6) + "']:\n")
-            self._incrementTab()
+            if '.' not in match.group(6):
+                stream.write(self._getTabs() + "if '" + match.group(6) + "' in self.Nests[''] and self.Nests['']['" + match.group(6) + "']:\n")
+                self._incrementTab()
+            else:
+                variableParts = match.group(6).split('.')
+                index = self.currentNest.index(variableParts[0])
+                if index is not None:
+                    nestVariable = '_'.join(self.currentNest[:index+1])
+                    stream.write(self._getTabs() + "if '" + variableParts[1] + "' in " + nestVariable + " and " + nestVariable + "['" + variableParts[1] + "']:\n")
+                    self._incrementTab()
         elif match.group(4) == "ELSE":
             self._decrementTab()
             stream.write(self._getTabs() + "else:\n")

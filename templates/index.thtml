@@ -24,7 +24,7 @@
 	<!-- BEGIN Nest -->
 	    Begin Nest: {Nest.NestTitle}<br />
 	    <!-- BEGIN NestedNest -->
-	        Nested Nest: {NestedNest.NestContent}<br />
+	        Nested Nest: {NestedNest.NestContent}<!-- IF NestedNest.IsTrue -->Its true!<!-- ENDIF --><br />
 	    <!-- END NestedNest -->
 	    End Nest.<br />
 	<!-- END Nest -->

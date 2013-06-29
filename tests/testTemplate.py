@@ -80,7 +80,7 @@ class TestTemplate(unittest.TestCase):
         self.indexPage._writeLine(output, '<!-- IF Var -->')
         header = output.getvalue()
         output.close()
-        self.assertSequenceEqual(header, "\t\tif self.Nests['']['Var']:\n")
+        self.assertSequenceEqual(header, "\t\tif 'Var' in self.Nests[''] and self.Nests['']['Var']:\n")
 
     def test_WriteLineShouldReplaceElseBlocks(self):
         output = cStringIO.StringIO()
@@ -131,9 +131,9 @@ class TestTemplate(unittest.TestCase):
         header = output.getvalue()
         output.close()
         self.assertSequenceEqual(header,
-                         "\t\tif self.Nests['']['Test']:\n"
+                         "\t\tif 'Test' in self.Nests[''] and self.Nests['']['Test']:\n"
                          "\t\t\tself.buffer.write('''\nIs True:''')\n" +
-                         "\t\t\tif self.Nests['']['Value']:\n"
+                         "\t\t\tif 'Value' in self.Nests[''] and self.Nests['']['Value']:\n"
                          "\t\t\t\tself.buffer.write('''Unreachable Code''')\n\n" +
                          "\t\t\tself.buffer.write('''\n''')\n\n")
 
@@ -183,3 +183,15 @@ class TestTemplate(unittest.TestCase):
                          "\t\t\t\t\tfor TestNest_NestedNest in TestNest['NestedNest']:\n"
                          "\t\t\t\t\t\tif 'Variable' in TestNest_NestedNest:\n" +
                          "\t\t\t\t\t\t\tself.buffer.write(TestNest_NestedNest['Variable'])\n\n\n")
+
+    def test_WriteLineShouldReplaceVariablesWithinIfsWithNestVariables(self):
+        output = cStringIO.StringIO()
+        self.indexPage._writeLine(output, '<!-- BEGIN TestNest --><!-- IF TestNest.Variable -->True<!-- ENDIF --><!-- END TestNest -->')
+        header = output.getvalue()
+        output.close()
+        self.maxDiff = None
+        self.assertSequenceEqual(header,
+                         "\t\tif 'TestNest' in self.Nests:\n" +
+                         "\t\t\tfor TestNest in self.Nests['TestNest']:\n" +
+                         "\t\t\t\tif 'Variable' in TestNest and TestNest['Variable']:\n" +
+                         "\t\t\t\t\tself.buffer.write('''True''')\n\n\n")
